@@ -259,6 +259,16 @@
 
   <repositories>
     <repository>
+      <id>micord-public</id>
+      <name>micord-public</name>
+      <url>https://repo.micord.ru/repository/maven-public</url>
+    </repository>
+    <repository>
+      <id>micord</id>
+      <name>micord</name>
+      <url>https://repo.micord.ru/repository/maven-micord</url>
+    </repository>
+    <repository>
       <!-- EXCLUSIVELY FOR `org.kogito:gwt-jsonix-schema-compiler:jar:1.3.0` -->
       <id>jboss</id>
       <name>JBoss Public Repo</name>

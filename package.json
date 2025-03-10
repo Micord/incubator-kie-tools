@@ -1,14 +1,14 @@
 {
   "private": true,
   "name": "kie-tools-root",
-  "version": "0.0.0",
+  "version": "0.31.0",
   "license": "Apache-2.0",
   "scripts": {
     "bootstrap": "pnpm bootstrap:root && pnpm bootstrap:packages",
     "bootstrap:packages": "kie-tools--bootstrap",
     "bootstrap:root": "pnpm install --workspace-root --strict-peer-dependencies=false -F kie-tools-root...",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --write . '**/*.xml' '!./packages/uniforms-patternfly/src/cjs' '!./packages/uniforms-patternfly/src/esm'",
+    "format:check": "prettier --check . '**/*.xml' '!./packages/uniforms-patternfly/src/cjs' '!./packages/uniforms-patternfly/src/esm'",
     "on-affected": "pnpm -F '...[HEAD]'",
     "on-affected-only": "pnpm -F '...^[HEAD]'",
     "on-changed": "pnpm -F '[HEAD]'",
