@@ -233,6 +233,7 @@ packages/sonataflow-operator/e2e-test-report.xml
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
+.idea
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -306,6 +307,7 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+/.idea/
 
 # xml-parser-ts-codegen on some packages
 packages/bpmn-marshaller/**/ts-gen

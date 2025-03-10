@@ -75,7 +75,6 @@ public class LiveSearchFooterViewImpl implements LiveSearchFooterView,
 
     @Override
     public void setNewEntryLabel(String newEntryLabel) {
-        newEntryAnchorLabel.setTextContent(newEntryLabel);
     }
 
     @Override
@@ -102,8 +101,6 @@ public class LiveSearchFooterViewImpl implements LiveSearchFooterView,
 
     @EventHandler("newEntryAnchor")
     public void onNewEntryPresed(ClickEvent clickEvent) {
-        clickEvent.stopPropagation();
-        presenter.onNewEntryPressed();
     }
 
     @EventHandler("resetAnchor")

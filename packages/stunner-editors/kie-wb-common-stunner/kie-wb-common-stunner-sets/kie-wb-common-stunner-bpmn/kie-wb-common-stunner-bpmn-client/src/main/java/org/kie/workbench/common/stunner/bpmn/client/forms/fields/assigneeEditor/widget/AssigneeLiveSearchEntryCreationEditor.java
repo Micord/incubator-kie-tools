@@ -23,6 +23,7 @@ package org.kie.workbench.common.stunner.bpmn.client.forms.fields.assigneeEditor
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.jboss.errai.common.client.dom.HTMLElement;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.kie.workbench.common.stunner.bpmn.client.forms.fields.i18n.StunnerBPMNConstants;
@@ -62,9 +63,51 @@ public class AssigneeLiveSearchEntryCreationEditor implements InlineCreationEdit
     }
 
     @Override
+    public void initRolesEditor() {
+        String roles = getRolesFromProject();
+
+        if (roles.isEmpty()){
+            DomGlobal.console.error("No roles available");
+        }
+        String[] rolesArray = roles.split("&");
+        for(String role : rolesArray) {
+            if (isValid(role)) {
+                this.customEntryCommand.execute(role);
+            }
+        }
+    }
+
+    @Override
+    public void initRolesEditor() {
+        String roles = getRolesFromProject();
+
+        if (roles.isEmpty()){
+            throw new RuntimeException("No available roles");
+        }
+        String[] rolesArray = delimiterRoles(roles);
+        for(String role : rolesArray) {
+            if (isValid(role)) {
+                this.customEntryCommand.execute(role);
+            }
+        }
+    }
+
+    @Override
     public void clear() {
         view.clear();
     }
+
+    private static native String getRolesFromProject()/*-{
+        return parent.parent.projectRoles.projectRoles;
+    }-*/;
+
+    private String[] delimiterRoles(String roles){
+        return roles.split("&");
+    }
+
+    private static native String getRolesFromProject()/*-{
+        return parent.parent.projectRoles.projectRoles;
+    }-*/;
 
     @Override
     public void onAccept() {

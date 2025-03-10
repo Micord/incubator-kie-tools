@@ -22,6 +22,7 @@ package org.kie.workbench.common.stunner.core.client.canvas.controls.select;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -124,6 +125,11 @@ public abstract class AbstractSelectionControl<H extends AbstractCanvasHandler>
     @Override
     public Collection<String> getSelectedItems() {
         return selectionControl.getSelectedItems();
+    }
+
+    @Override
+    public Map<String, Boolean> getItems() {
+        return selectionControl.getItems();
     }
 
     @Override
