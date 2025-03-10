@@ -67,21 +67,6 @@ public class AssigneeLiveSearchEntryCreationEditor implements InlineCreationEdit
         String roles = getRolesFromProject();
 
         if (roles.isEmpty()){
-            DomGlobal.console.error("No roles available");
-        }
-        String[] rolesArray = roles.split("&");
-        for(String role : rolesArray) {
-            if (isValid(role)) {
-                this.customEntryCommand.execute(role);
-            }
-        }
-    }
-
-    @Override
-    public void initRolesEditor() {
-        String roles = getRolesFromProject();
-
-        if (roles.isEmpty()){
             throw new RuntimeException("No available roles");
         }
         String[] rolesArray = delimiterRoles(roles);
@@ -96,10 +81,6 @@ public class AssigneeLiveSearchEntryCreationEditor implements InlineCreationEdit
     public void clear() {
         view.clear();
     }
-
-    private static native String getRolesFromProject()/*-{
-        return parent.parent.projectRoles.projectRoles;
-    }-*/;
 
     private String[] delimiterRoles(String roles){
         return roles.split("&");
