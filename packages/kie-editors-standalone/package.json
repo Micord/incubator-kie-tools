@@ -28,23 +28,24 @@
     "dist/jsdiagram"
   ],
   "scripts": {
-    "build:dev": "rimraf dist && webpack --env dev --config webpack.build-resources.config.js && pnpm build:preprocessor && webpack --env dev --config webpack.package-resources.config.js",
+    "build:bundle-types": "dts-bundle-generator --config dts-bundle.config.json",
+    "build:dev": "rimraf dist && webpack --env dev --config webpack.build-resources.config.js && pnpm build:preprocessor && webpack --env dev --config webpack.package-resources.config.js && pnpm build:bundle-types",
     "build:preprocessor": "node dist/preprocessor/preprocessor.js",
-    "build:prod": "pnpm lint && pnpm test && rimraf dist && webpack --config webpack.build-resources.config.js && pnpm build:preprocessor && webpack --config webpack.package-resources.config.js && pnpm test:it",
+    "build:prod": "pnpm lint && pnpm test && rimraf dist && webpack --config webpack.build-resources.config.js && pnpm build:preprocessor && webpack --config webpack.package-resources.config.js && pnpm build:bundle-types && pnpm test-e2e",
     "build:productization": "pnpm build:prod",
     "cy:open": "run-script-os",
-    "cy:open:darwin:linux": "cypress open --project it-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"",
-    "cy:open:win32": "pnpm powershell \"cypress open --project it-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"\"",
+    "cy:open:darwin:linux": "cypress open --project e2e-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"",
+    "cy:open:win32": "pnpm powershell \"cypress open --project e2e-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"\"",
     "cy:run": "run-script-os",
-    "cy:run:darwin:linux": "cypress run -b chrome --project it-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"",
-    "cy:run:win32": "pnpm powershell \"cypress run -b chrome --project it-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"\"",
+    "cy:run:darwin:linux": "cypress run -b chrome --project e2e-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"",
+    "cy:run:win32": "pnpm powershell \"cypress run -b chrome --project e2e-tests --config \"baseUrl=http://localhost:$(build-env standaloneEditors.dev.port)\"\"",
     "lint": "run-script-if --bool \"$(build-env linters.run)\" --then \"kie-tools--eslint ./src\"",
+    "postreport": "jrm ./dist-tests-e2e/junit-transformed.xml \"./dist-tests-e2e/junit-report*.xml\"",
     "powershell": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command",
-    "postreport": "jrm ./dist-it-tests/junit-transformed.xml \"./dist-it-tests/junit-report*.xml\"",
     "start": "webpack serve --host 0.0.0.0 --config webpack.package-resources.config.js",
-    "start:it": "webpack serve --host 0.0.0.0 --config ./it-tests/webpack.config.js",
+    "start-e2e": "webpack serve --host 0.0.0.0 --config ./e2e-tests/webpack.config.js",
     "test": "run-script-if --ignore-errors \"$(build-env tests.ignoreFailures)\" --bool \"$(build-env tests.run)\" --then \"jest --silent --verbose --passWithNoTests\"",
-    "test:it": "run-script-if --ignore-errors \"$(build-env integrationTests.ignoreFailures)\" --bool \"$(build-env integrationTests.run)\" --then \"pnpm rimraf ./dist-it-tests\" \"pnpm start-server-and-test start:it http-get://0.0.0.0:$(build-env standaloneEditors.dev.port) cy:run\" \"pnpm postreport\""
+    "test-e2e": "run-script-if --ignore-errors \"$(build-env endToEndTests.ignoreFailures)\" --bool \"$(build-env endToEndTests.run)\" --then \"pnpm rimraf ./dist-tests-e2e\" \"pnpm start-server-and-test start-e2e http-get://0.0.0.0:$(build-env standaloneEditors.dev.port) cy:run\" \"pnpm postreport\""
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",

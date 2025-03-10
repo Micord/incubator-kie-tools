@@ -37,7 +37,6 @@ import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportT
 import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToPngSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToRawFormatSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToSvgSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.FullSelectionSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.PasteSelectionSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.RedoSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.SaveDiagramSessionCommand;
@@ -75,7 +74,6 @@ public class EditorSessionCommands {
                 .register(ExportToSvgSessionCommand.class)
                 .register(ExportToRawFormatSessionCommand.class)
                 .register(CopySelectionSessionCommand.class)
-                .register(FullSelectionSessionCommand.class)
                 .register(PasteSelectionSessionCommand.class)
                 .register(CutSelectionSessionCommand.class)
                 .register(SaveDiagramSessionCommand.class);
@@ -149,10 +147,6 @@ public class EditorSessionCommands {
 
     public CopySelectionSessionCommand getCopySelectionSessionCommand() {
         return commands.get(CopySelectionSessionCommand.class);
-    }
-
-    public FullSelectionSessionCommand getFullSelectionSessionCommand() {
-        return commands.get(FullSelectionSessionCommand.class);
     }
 
     public PasteSelectionSessionCommand getPasteSelectionSessionCommand() {
