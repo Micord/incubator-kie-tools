@@ -370,11 +370,6 @@
       <artifactId>elemental2-promise</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <!-- Generic ui components -->
     <dependency>
@@ -492,6 +487,11 @@
       <artifactId>webdrivermanager</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
@@ -552,6 +552,13 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
+          </dependency>
+        </dependencies>
         <configuration>
           <extraJvmArgs
           >-Xmx3G -Xms512m -Xss1M -XX:CompileThreshold=7000 -XX:+UseSerialGC -Derrai.dynamic_validation.enabled=true</extraJvmArgs>

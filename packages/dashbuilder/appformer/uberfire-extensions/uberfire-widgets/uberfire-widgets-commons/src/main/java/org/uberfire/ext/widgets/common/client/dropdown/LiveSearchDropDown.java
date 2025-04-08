@@ -38,7 +38,7 @@ import org.uberfire.mvp.Command;
 public class LiveSearchDropDown<TYPE> implements IsWidget {
 
     private View<TYPE> view;
-    private int maxItems = 10;
+    private int maxItems = 1000;
     private LiveSearchService<TYPE> searchService = null;
     private boolean changeCallbackEnabled = true;
     private boolean searchEnabled = true;
@@ -131,6 +131,14 @@ public class LiveSearchDropDown<TYPE> implements IsWidget {
         } else {
             view.setNewInstanceEnabled(false);
         }
+    }
+
+    public void initForRoles(){
+        EntryCreationLiveSearchService<TYPE, ?> creationService = (EntryCreationLiveSearchService<TYPE, ?>) searchService;
+        EntryCreationEditor<TYPE> editor = creationService.getEditor();
+        InlineCreationEditor<TYPE> inlineEditor = (InlineCreationEditor<TYPE>) editor;
+
+        inlineEditor.initRolesEditor();
     }
 
     protected void addNewItem(LiveSearchEntry<TYPE> entry) {

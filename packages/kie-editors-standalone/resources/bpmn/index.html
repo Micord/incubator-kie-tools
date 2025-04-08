@@ -19,7 +19,7 @@
 
 <!-- This file is used for test purposes only -->
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <style>
@@ -29,10 +29,46 @@
 
       .toolbar {
         height: 30px;
+        display: flex;
+        align-items: center;
+        margin: 0px 0px 5px 0px;
       }
 
       .hidden {
         display: none;
+      }
+
+      .webbpm-button {
+        height: 30px;
+        width: 30px;
+        border: 1px solid #0202;
+        border-radius: 2px;
+        margin: 0px 5px 0px 5px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #undo,
+      #redo,
+      #save {
+        background-size: auto;
+        background-position: center;
+        cursor: pointer;
+      }
+
+      #undo {
+        background: url("img/undo.svg") no-repeat,
+          linear-gradient(white, #eeeeee);
+      }
+
+      #redo {
+        background: url("img/redo.svg") no-repeat,
+          linear-gradient(white, #eeeeee);
+      }
+
+      #save {
+        background: url("img/save.svg") no-repeat,
+          linear-gradient(white, #eeeeee);
       }
     </style>
 
@@ -44,18 +80,89 @@
   </head>
   <body>
     <div class="toolbar">
-      <button id="undo">Undo</button>
-      <button id="redo">Redo</button>
-      <button id="download">Download</button>
-      <button id="downloadSvg">Download SVG</button>
-      <span id="unsavedChanges" class="hidden">File contains unsaved changes.</span>
+      <button id="undo" class="webbpm-button"></button>
+      <button id="redo" class="webbpm-button"></button>
+      <button id="save" class="webbpm-button"></button>
+      <span id="unsavedChanges" class="hidden"
+        >File contains unsaved changes.</span
+      >
     </div>
     <div id="bpmn-editor-container" />
-
     <script>
+      const processesURL = `${window.location.origin}/jbpm-designer-backend/processes`;
+      const processSaveURL = `${window.location.origin}/jbpm-designer-backend/process`;
+      const rolesURL = `${window.location.origin}/jbpm-designer-backend/roles`;
+
+      const query = window.location.search;
+      //Получение URL с помощью "const urlParams = new URLSearchParams(queryString);" работает некорректно
+      var urlParameters = query.split("?q=")[1].split("&");
+
+      var savedContent = {};
+      var projectRoles = {};
+      var resourcesPaths = {};
+      var nodeElementId = {};
+      var processNotSave = {};
+      var savedSvg = {};
+      var nodeElementType;
+      var nodeElementName;
+      var processId = {};
+      var processName = b64DecodeUnicode(urlParameters[1]);
+      var projectName = urlParameters[2];
+      var processPath = b64DecodeUnicode(urlParameters[3]);
+      var projectPath = b64DecodeUnicode(urlParameters[4]);
+      var contentURI = `${
+        window.location.origin
+      }/${projectName}-resources/${b64DecodeUnicode(urlParameters[0])}`;
+      var content = getContent(contentURI);
+
+      var proxyElementId = new Proxy(nodeElementId, {
+        set: function (target, key, value) {
+          target[key] = value;
+          return true;
+        },
+      });
+      var proxySavedContent = new Proxy(savedContent, {
+        set: function (target, key, value) {
+          target[key] = value;
+          return true;
+        },
+      });
+
+      var proxyProcessNotSave = new Proxy(processNotSave, {
+        set: function (target, key, value) {
+          target[key] = value;
+          return true;
+        },
+      });
+
+      var proxyProcessId = new Proxy(processId, {
+        set: function (target, key, value) {
+          target[key] = value;
+          return true;
+        },
+      });
+
+      function getContent(contentURI) {
+        return fetch(contentURI).then((response) => {
+          return response.text();
+        });
+      }
+
+      function b64DecodeUnicode(encode) {
+        return decodeURIComponent(
+          atob(encode)
+            .trim()
+            .split("")
+            .map(function (c) {
+              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join("")
+        );
+      }
+
       const editor = BpmnEditor.open({
         container: document.getElementById("bpmn-editor-container"),
-        initialContent: Promise.resolve(""),
+        initialContent: Promise.resolve(content),
         readOnly: false,
       });
 
@@ -67,36 +174,137 @@
         editor.redo();
       });
 
-      document.getElementById("download").addEventListener("click", () => {
-        editor.getContent().then((content) => {
-          const elem = window.document.createElement("a");
-          elem.href = "data:text/plain;charset=utf-8," + encodeURIComponent(content);
-          elem.download = "model.bpmn";
-          document.body.appendChild(elem);
-          elem.click();
-          document.body.removeChild(elem);
-          editor.markAsSaved();
-        });
+      document.getElementById("save").addEventListener("click", () => {
+        clickSaveProcess();
       });
 
-      document.getElementById("downloadSvg").addEventListener("click", () => {
-        editor.getPreview().then((svgContent) => {
-          const elem = window.document.createElement("a");
-          elem.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgContent);
-          elem.download = "model.svg";
-          document.body.appendChild(elem);
-          elem.click();
-          document.body.removeChild(elem);
-        });
+      document.addEventListener("DOMContentLoaded", () => {
+        loadProcesses();
+        loadRoles();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        keydownListenerFunction(event);
       });
 
       editor.subscribeToContentChanges((isDirty) => {
-        if (isDirty) {
-          document.getElementById("unsavedChanges").classList.remove("hidden");
-        } else {
-          document.getElementById("unsavedChanges").classList.add("hidden");
-        }
+        proxyProcessNotSave.processNotSave = !isDirty;
       });
+
+      function keydownListenerFunction(event) {
+        if (event.ctrlKey && event.code === "KeyS") {
+          // Prevent the Save dialog to open
+          event.preventDefault();
+          clickSaveProcess();
+        }
+      }
+
+      function loadProcesses() {
+        if (processPath !== undefined) {
+          const params = new URLSearchParams();
+          params.append("processPath", processPath);
+
+          const requestOptions = {
+            method: "GET",
+          };
+
+          return fetch(processesURL + `?${params}`, requestOptions)
+            .then((response) => response.json())
+            .then((json) => {
+              console.debug(json);
+              if (json.data) {
+                resourcesPaths = json.data;
+              }
+              logResponse(json);
+            })
+            .catch((error) => {
+              console.error(error);
+              alert(error);
+            });
+        }
+        return {};
+      }
+
+      function loadRoles() {
+        if (projectPath !== undefined) {
+          const params = new URLSearchParams();
+          params.append("projectPath", projectPath);
+
+          const requestOptions = {
+            method: "GET",
+          };
+
+          return fetch(rolesURL + `?${params}`, requestOptions)
+            .then((response) => response.json())
+            .then((json) => {
+              console.debug(json);
+              if (json.data) {
+                projectRoles.projectRoles = json.data;
+              }
+              logResponse(json);
+            })
+            .catch((error) => {
+              console.error(error);
+              alert(error);
+            });
+        }
+        return "";
+      }
+
+      function clickSaveProcess() {
+        if (processPath !== undefined) {
+          editor.getContent().then((content) => {
+            editor.getPreview().then((preview) => {
+              saveProcess(content, preview);
+            });
+          });
+        }
+      }
+
+      function saveProcess(content, svg) {
+        const params = {};
+        params["processPath"] = processPath;
+        params["processContent"] = content;
+        params["svgContent"] = svg;
+
+        const requestOptions = {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(params),
+        };
+
+        fetch(processSaveURL, requestOptions)
+          .then((response) => response.json())
+          .then((json) => {
+            console.debug(json);
+            if (json.data) {
+              editor.markAsSaved();
+            }
+            logResponse(json);
+          })
+          .catch((error) => {
+            console.error(error);
+            alert(error);
+          });
+      }
+
+      function logResponse(response) {
+        if (response.errors) {
+          for (const element of response.errors) {
+            console.log("ERROR: " + element);
+          }
+        }
+        if (response.warns) {
+          for (const element of response.warns) {
+            console.log("WARN: " + element);
+          }
+        }
+        if (response.alert) {
+          alert(response.alert);
+        }
+      }
     </script>
   </body>
 </html>

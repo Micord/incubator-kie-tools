@@ -165,6 +165,10 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.kogito.stunner.editors</groupId>
+      <artifactId>lienzo-core</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.google.gwt.gwtmockito</groupId>
