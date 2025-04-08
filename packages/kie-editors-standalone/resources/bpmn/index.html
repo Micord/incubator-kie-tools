@@ -19,7 +19,7 @@
 
 <!-- This file is used for test purposes only -->
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <style>
@@ -48,22 +48,27 @@
         overflow: hidden;
       }
 
-      #undo, #redo, #save {
+      #undo,
+      #redo,
+      #save {
         background-size: auto;
         background-position: center;
         cursor: pointer;
       }
 
       #undo {
-        background: url('img/undo.svg') no-repeat, linear-gradient(white, #EEEEEE);
+        background: url("img/undo.svg") no-repeat,
+          linear-gradient(white, #eeeeee);
       }
 
       #redo {
-        background: url('img/redo.svg') no-repeat, linear-gradient(white, #EEEEEE);
+        background: url("img/redo.svg") no-repeat,
+          linear-gradient(white, #eeeeee);
       }
 
       #save {
-       background: url('img/save.svg') no-repeat, linear-gradient(white, #EEEEEE);
+        background: url("img/save.svg") no-repeat,
+          linear-gradient(white, #eeeeee);
       }
     </style>
 
@@ -78,7 +83,9 @@
       <button id="undo" class="webbpm-button"></button>
       <button id="redo" class="webbpm-button"></button>
       <button id="save" class="webbpm-button"></button>
-      <span id="unsavedChanges" class="hidden">File contains unsaved changes.</span>
+      <span id="unsavedChanges" class="hidden"
+        >File contains unsaved changes.</span
+      >
     </div>
     <div id="bpmn-editor-container" />
     <script>
@@ -103,7 +110,9 @@
       var projectName = urlParameters[2];
       var processPath = b64DecodeUnicode(urlParameters[3]);
       var projectPath = b64DecodeUnicode(urlParameters[4]);
-      var contentURI = `${window.location.origin}/${projectName}-resources/${b64DecodeUnicode(urlParameters[0])}`;
+      var contentURI = `${
+        window.location.origin
+      }/${projectName}-resources/${b64DecodeUnicode(urlParameters[0])}`;
       var content = getContent(contentURI);
 
       var proxyElementId = new Proxy(nodeElementId, {
@@ -183,7 +192,7 @@
       });
 
       function keydownListenerFunction(event) {
-        if (event.ctrlKey && event.code === 'KeyS') {
+        if (event.ctrlKey && event.code === "KeyS") {
           // Prevent the Save dialog to open
           event.preventDefault();
           clickSaveProcess();
@@ -193,25 +202,25 @@
       function loadProcesses() {
         if (processPath !== undefined) {
           const params = new URLSearchParams();
-          params.append('processPath', processPath);
+          params.append("processPath", processPath);
 
           const requestOptions = {
-            method: 'GET'
+            method: "GET",
           };
 
           return fetch(processesURL + `?${params}`, requestOptions)
-                  .then(response => response.json())
-                  .then(json => {
-                    console.debug(json);
-                    if (json.data) {
-                      resourcesPaths = json.data;
-                    }
-                    logResponse(json);
-                  })
-                  .catch(error => {
-                    console.error(error);
-                    alert(error);
-                  });
+            .then((response) => response.json())
+            .then((json) => {
+              console.debug(json);
+              if (json.data) {
+                resourcesPaths = json.data;
+              }
+              logResponse(json);
+            })
+            .catch((error) => {
+              console.error(error);
+              alert(error);
+            });
         }
         return {};
       }
@@ -219,27 +228,27 @@
       function loadRoles() {
         if (projectPath !== undefined) {
           const params = new URLSearchParams();
-          params.append('projectPath', projectPath);
+          params.append("projectPath", projectPath);
 
           const requestOptions = {
-            method: 'GET'
+            method: "GET",
           };
 
           return fetch(rolesURL + `?${params}`, requestOptions)
-                  .then(response => response.json())
-                  .then(json => {
-                    console.debug(json);
-                    if (json.data) {
-                      projectRoles.projectRoles = json.data;
-                    }
-                    logResponse(json);
-                  })
-                  .catch(error => {
-                    console.error(error);
-                    alert(error);
-                  });
+            .then((response) => response.json())
+            .then((json) => {
+              console.debug(json);
+              if (json.data) {
+                projectRoles.projectRoles = json.data;
+              }
+              logResponse(json);
+            })
+            .catch((error) => {
+              console.error(error);
+              alert(error);
+            });
         }
-        return '';
+        return "";
       }
 
       function clickSaveProcess() {
@@ -254,42 +263,42 @@
 
       function saveProcess(content, svg) {
         const params = {};
-        params['processPath'] = processPath;
-        params['processContent'] = content;
-        params['svgContent'] = svg;
+        params["processPath"] = processPath;
+        params["processContent"] = content;
+        params["svgContent"] = svg;
 
         const requestOptions = {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(params)
+          body: JSON.stringify(params),
         };
 
         fetch(processSaveURL, requestOptions)
-                .then(response => response.json())
-                .then(json => {
-                  console.debug(json);
-                  if (json.data) {
-                    editor.markAsSaved();
-                  }
-                  logResponse(json);
-                })
-                .catch(error => {
-                  console.error(error);
-                  alert(error);
-                });
+          .then((response) => response.json())
+          .then((json) => {
+            console.debug(json);
+            if (json.data) {
+              editor.markAsSaved();
+            }
+            logResponse(json);
+          })
+          .catch((error) => {
+            console.error(error);
+            alert(error);
+          });
       }
 
       function logResponse(response) {
         if (response.errors) {
           for (const element of response.errors) {
-            console.log('ERROR: ' + element);
+            console.log("ERROR: " + element);
           }
         }
         if (response.warns) {
           for (const element of response.warns) {
-            console.log('WARN: ' + element);
+            console.log("WARN: " + element);
           }
         }
         if (response.alert) {
